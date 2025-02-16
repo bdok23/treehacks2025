@@ -1,46 +1,33 @@
 // src/components/CarbonTreemap.js
 import React, { useEffect, useState } from 'react';
 import Papa from 'papaparse';
-import { Treemap, Tooltip, ResponsiveContainer } from 'recharts';
+import { Treemap, Tooltip } from 'recharts';
 
 function CarbonTreemap({ targetCountry }) {
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
-    console.log('CarbonTreemap: Starting CSV parse for country:', targetCountry);
-    Papa.parse('/data/emissions.csv', {
-      download: true,
-      header: true,
-      dynamicTyping: true,
-      complete: (results) => {
-        console.log('Papa.parse complete. Full results:', results);
-
-        if (results.errors && results.errors.length > 0) {
-          console.error('CSV Parsing errors:', results.errors);
-        }
-
-        results.data.forEach((row, index) => {
-          console.log(`Row ${index}:`, row);
+    async function fetchData() {
+      try {
+        const response = await fetch('/data/emissions.csv');
+        const csvText = await response.text();
+        const results = Papa.parse(csvText, {
+          header: true,
+          dynamicTyping: true,
         });
-
-        // Filter rows using the "Country" column (case-insensitive) and ensure Sector exists
-        const countryRows = results.data.filter((row) => {
-          return (
+        // Filter rows by the "Country" column (case-insensitive) that have a Sector defined
+        const filtered = results.data.filter(
+          (row) =>
             row.Country &&
             row.Country.toLowerCase() === targetCountry.toLowerCase() &&
             row.Sector
-          );
-        });
-        console.log('Filtered countryRows:', countryRows);
-
-        // Build flat sector data using the 2021 column as value
-        const sectorData = countryRows.map((row) => ({
+        );
+        // Map rows to sector data using the '2021' column as value
+        const sectorData = filtered.map((row) => ({
           name: row.Sector,
-          value: parseFloat(row['2021'] || 0),
+          value: Number(row['2021']) || 0,
         }));
-        console.log('Flat sector data:', sectorData);
-
-        // Transform into hierarchical data with a root node
+        // Wrap data in a root node to form hierarchical data
         const treeData = [
           {
             name: targetCountry,
@@ -50,40 +37,38 @@ function CarbonTreemap({ targetCountry }) {
                 : [{ name: 'Placeholder Sector', value: 100 }],
           },
         ];
-        console.log('Hierarchical tree data:', treeData);
-
-        // setChartData(treeData);
-      },
-      error: (err) => {
-        console.error('Error parsing CSV:', err);
-      },
-    });
+        setChartData(treeData);
+      } catch (error) {
+        console.error('Error loading CSV:', error);
+      }
+    }
+    fetchData();
   }, [targetCountry]);
 
   return (
     <div
       style={{
-        width: '100%',
+        width: '400px',
         height: '400px',
         margin: '0 auto',
         border: '1px solid #ccc',
-        padding: '0.5rem'
+        padding: '0.5rem',
       }}
     >
       <h2>Treemap by Sector for {targetCountry}</h2>
       {chartData.length > 0 ? (
-        <ResponsiveContainer width="100%" height="100%">
-          <Treemap
-            data={chartData}
-            dataKey="value"
-            nameKey="name"
-            aspectRatio={4 / 3}
-            stroke="#fff"
-            fill="#8884d8"
-          >
-            <Tooltip />
-          </Treemap>
-        </ResponsiveContainer>
+        <Treemap
+          width={400}
+          height={400}
+          data={chartData}
+          dataKey="value"
+          nameKey="name"
+          stroke="#fff"
+          fill="#8884d8"
+        >
+          <Tooltip />
+        </Treemap>
+        // <p>hi</p>
       ) : (
         <p>Loading data...</p>
       )}
