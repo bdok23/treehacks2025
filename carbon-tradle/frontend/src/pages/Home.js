@@ -83,6 +83,8 @@ function Home() {
   const [distanceRange, setDistanceRange] = useState({ max: 0 });
   const [showAIChatModal, setShowAIChatModal] = useState(false);
   const [showWorldMap, setShowWorldMap] = useState(false);
+  const [showHowToUseModal, setShowHowToUseModal] = useState(false);
+
 
 
   const maxGuesses = 6;
@@ -119,6 +121,101 @@ function Home() {
     const randomIndex = Math.floor(Math.random() * hardcodedTargetCountries.length);
     setTargetCountry(hardcodedTargetCountries[randomIndex]);
   }, []);
+
+  // ======== "How To Use" Modal ========
+  function HowToUseModal({ onClose }) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 2000,
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: '#fff',
+            borderRadius: '8px',
+            padding: '2rem',
+            maxWidth: '600px',
+            width: '90%',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+            textAlign: 'left',
+          }}
+        >
+          <h2 style={{ marginTop: 0 }}>How to Use This Application</h2>
+          <p>
+            <strong>Purpose:</strong> This is a geography and environmental puzzle game where you 
+            have up to 6 guesses to identify the target country. The application leverages 
+            real-world carbon emissions data and displays them with Recharts Treemaps. 
+          </p>
+          <p>
+            <strong>How It Works:</strong> 
+          </p>
+          <ul>
+            <li>
+              A random <em>target country</em> is chosen at the start.
+            </li>
+            <li>
+              Enter your guesses in the input field. Each guess reveals hints about distance
+              and accuracy, guiding you closer to the target.
+            </li>
+            <li>
+              Treemaps are displayed for both the target country (showing sector-based emissions)
+              and your most recent guess (to compare sector emissions).
+            </li>
+            <li>
+              If you run out of guesses or guess the country correctly, a final result screen appears.
+            </li>
+            <li>
+              After the game ends, an OpenAI-based summary is displayed with environmental information
+              about the target country.
+            </li>
+          </ul>
+          <p>
+            <strong>Features:</strong>
+          </p>
+          <ul>
+            <li>
+              <em>Distance &amp; Accuracy Feedback:</em> We use haversine distance to compute how far 
+              your guess is from the target. This is converted to a visual accuracy meter.
+            </li>
+            <li>
+              <em>Sector Emissions Data:</em> Sectors like Energy, Industrial, Agriculture, etc., 
+              are shown in Treemaps for a deeper look at each country’s emission sources.
+            </li>
+            <li>
+              <em>OpenAI Chat:</em> After the puzzle, you get an AI-generated summary of 
+              environmental insights for the revealed country.
+            </li>
+          </ul>
+          <p>
+            Explore the <em>World Map</em> to get a general sense of geography (click the "Show World Map" button).
+            Then, apply your knowledge to guess the country as efficiently as possible!
+          </p>
+          <button
+            onClick={onClose}
+            style={{
+              marginTop: '1rem',
+              padding: '0.5rem 1rem',
+              border: 'none',
+              borderRadius: '4px',
+              backgroundColor: '#8884d8',
+              color: 'white',
+              cursor: 'pointer',
+            }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
+
 
   // Load unique countries from emissions.csv for the dropdown
   useEffect(() => {
@@ -476,6 +573,25 @@ function Home() {
 
   return (
     <div style={{ paddingBottom: '4rem' }}>
+      <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+        <button
+          onClick={() => setShowHowToUseModal(true)}
+          style={{
+            padding: '0.5rem 1rem',
+            border: 'none',
+            borderRadius: '4px',
+            backgroundColor: '#8884d8',
+            color: 'white',
+            cursor: 'pointer',
+          }}
+        >
+          How to Use
+        </button>
+      </div>
+
+       {/* Show "How to Use" modal if open */}
+       {showHowToUseModal && <HowToUseModal onClose={() => setShowHowToUseModal(false)} />}
+
       
       <div>
         {/* <h2>Target Country Treemap</h2> */}
