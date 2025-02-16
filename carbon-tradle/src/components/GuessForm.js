@@ -1,12 +1,12 @@
+// src/components/GuessForm.js
 import React, { useState } from 'react';
 
-function GuessForm() {
+function GuessForm({ onGuess }) {
   const [guess, setGuess] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle guess submission logic here
-    console.log('User guessed:', guess);
+    onGuess(guess);
     setGuess('');
   };
 
