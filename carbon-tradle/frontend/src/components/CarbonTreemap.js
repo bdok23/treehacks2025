@@ -21,17 +21,31 @@ const renderCustomizedContent = (props) => {
   const { x, y, width, height, index, name, value } = props;
   const fill = COLORS[index % COLORS.length];
 
-  // Adjust the font size: now using 1/10 of the smaller dimension instead of 1/5.
-  const fontSize = Math.max(6, Math.min(width, height) / 15);
+  // Increase the minimum font size to improve legibility
+  const fontSize = Math.max(12, Math.min(width, height) / 10);
+
+  // Only show text if the rectangle is large enough
+  const showText = width > 50 && height > 20;
 
   return (
     <g>
-      <rect x={x} y={y} width={width} height={height} stroke="#fff" fill={fill} />
-      {width > 50 && height > 20 && (
+      {/* Draw the colored rectangle */}
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        stroke="#fff"
+        fill={fill}
+      />
+
+      {/* Render plain black text if the rectangle is big enough */}
+      {showText && (
         <text
           x={x + width / 2}
           y={y + height / 2}
           textAnchor="middle"
+          dominantBaseline="middle"
           fill="#000"
           fontSize={fontSize}
         >
@@ -41,6 +55,7 @@ const renderCustomizedContent = (props) => {
     </g>
   );
 };
+
 
 
 function CarbonTreemap({ targetCountry, hideCountryName = false }) {
@@ -75,11 +90,13 @@ function CarbonTreemap({ targetCountry, hideCountryName = false }) {
 
         setAllSectors(sectors);
 
-        // Initialize each sector as selected except "Total excluding LUCF"
+        // Initialize each sector as selected except "Total excluding LUCF" & "Total including LUCF"
         const initialSelections = {};
         sectors.forEach((sector) => {
-          initialSelections[sector.name] =
-            (sector.name === 'Total excluding LUCF' || sector.name === 'Total including LUCF') ? false : true;
+          initialSelections[sector.name] = !(
+            sector.name === 'Total excluding LUCF' ||
+            sector.name === 'Total including LUCF'
+          );
         });
         setSelectedSectors(initialSelections);
       } catch (error) {
@@ -90,7 +107,7 @@ function CarbonTreemap({ targetCountry, hideCountryName = false }) {
     fetchData();
   }, [targetCountry]);
 
-  // Filter sectors based on checkbox selections 
+  // Filter sectors based on checkbox selections
   const filteredSectors = allSectors.filter(
     (sector) => selectedSectors[sector.name]
   );
@@ -116,58 +133,57 @@ function CarbonTreemap({ targetCountry, hideCountryName = false }) {
   };
 
   return (
-    <div style={{ width: '1000px', margin: '0 auto', padding: '1rem' }}>
-      {/* Conditionally render header based on hideCountryName prop */}
-      {!hideCountryName ? (
-        <h2>Treemap by Sector for {targetCountry}</h2>
-      ) : (
-        <h2>Treemap by Sector</h2>
-      )}
+  <div style={{ width: '1000px', margin: '0 auto', padding: '1rem' }}>
 
-      {/* Checkbox Section */}
-      <div style={{ marginBottom: '1rem' }}>
-        <h3>Select Sectors</h3>
+    {hideCountryName ? (
+            <h2>
+              Climate Watch Data for {targetCountry}
+            </h2>
+        ) : (
+            <h2>Climate Watch Data</h2>
+        )}
+    
+
+    {/* Treemap Section */}
+    <div style={{ border: '1px solid #ccc', padding: '0.5rem' }}>
+      <Treemap
+        width={1000}
+        height={600}
+        data={treeData}
+        dataKey="value"
+        nameKey="name"
+        stroke="#fff"
+        content={renderCustomizedContent}
+      >
+        <Tooltip />
+      </Treemap>
+    </div>
+
+    {/* Now the checkbox section BELOW the treemap */}
+    <div style={{ marginTop: '1rem' }}>
+      <h3>Select Sectors</h3>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
         {Object.keys(selectedSectors).length > 0 ? (
           Object.keys(selectedSectors).map((sectorName) => (
-            <div key={sectorName}>
-              <label>
-                <input
-                  type="checkbox"
-                  name={sectorName}
-                  checked={selectedSectors[sectorName]}
-                  onChange={handleCheckboxChange}
-                />
-                {sectorName}
-              </label>
-            </div>
+            <label key={sectorName} style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <input
+                type="checkbox"
+                name={sectorName}
+                checked={selectedSectors[sectorName]}
+                onChange={handleCheckboxChange}
+                style={{ marginRight: '4px' }}
+              />
+              {sectorName}
+            </label>
           ))
         ) : (
           <p>Loading sectors...</p>
         )}
       </div>
-
-      {/* Treemap Section */}
-      <div style={{ border: '1px solid #ccc', padding: '0.5rem' }}>
-        {treeData && treeData[0].children ? (
-          <Treemap
-            width={1000}
-            height={600}
-            data={treeData}
-            dataKey="value"
-            nameKey="name"
-            stroke="#fff"
-            content={renderCustomizedContent}
-          >
-            <Tooltip />
-          </Treemap>
-        ) : (
-          <p>Loading chart...</p>
-        )}
-      </div>
     </div>
+  </div>
   );
 }
 
 export default CarbonTreemap;
-
 

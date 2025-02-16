@@ -19,3 +19,10 @@ html {
   padding: 0;
   box-sizing: border-box;
 }
+
+/* index.css or any global CSS file */
+svg text {
+  stroke: none !important;
+  fill: #000 !important; /* or whatever your desired color is */
+  paint-order: fill;
+}
