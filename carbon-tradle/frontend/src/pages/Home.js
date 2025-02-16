@@ -11,6 +11,9 @@ import {
   generateHash,
 } from '../utils/distanceUtils';
 import CarbonTreemapNest from '../components/CarbonTreemapNest';
+import OpenAIChat from '../components/openai';
+import map from '../assets/worldMap.png';
+
 
 /**
  * AnimatedAccuracy Component
@@ -78,6 +81,9 @@ function Home() {
   const [modalType, setModalType] = useState('');
   const [countryCoordinates, setCountryCoordinates] = useState({});
   const [distanceRange, setDistanceRange] = useState({ max: 0 });
+  const [showAIChatModal, setShowAIChatModal] = useState(false);
+  const [showWorldMap, setShowWorldMap] = useState(false);
+
 
   const maxGuesses = 6;
   let hardcodedTargetCountries = [
@@ -85,7 +91,7 @@ function Home() {
     "Australia", "Austria", "Azerbaijan", "Burundi", "Belgium", "Benin", "Burkina Faso", "Bangladesh",
     "Bulgaria", "Bahrain", "Bahamas", "Bosnia and Herzegovina", "Belarus", "Belize", "Bolivia", "Brazil",
     "Barbados", "Brunei", "Bhutan", "Botswana", "Central African Republic", "Canada", "Chile", "China",
-    "Ivory Coast", "Cameroon", "Democratic Republic of the Congo", "Cook Islands", "Colombia", "Comoros",
+    "Ivory Coast", "Cameroon", "Democratic Republic of the Congo", "Colombia", "Comoros",
     "Cape Verde", "Costa Rica", "Cuba", "Cyprus", "Czech Republic", "Djibouti", "Dominica", "Denmark",
     "Dominican Republic", "Algeria", "Croatia", "Cambodia", "Chad", "Germany", "Ecuador", "Egypt", "Eritrea",
     "Estonia", "Ethiopia", "Finland", "Fiji", "France", "Gabon", "Georgia", "Ghana", "Guinea", "Gambia",
@@ -94,7 +100,7 @@ function Home() {
     "Jordan", "Japan", "Kazakhstan", "Kenya", "Kyrgyzstan", "Kiribati", "Kuwait", "Laos", "Lebanon",
     "Liberia", "Libya", "Liechtenstein", "Lesotho", "Lithuania", "Luxembourg", "Latvia", "El Salvador",
     "Eswatini", "Republic of the Congo", "Micronesia", "Saint Kitts and Nevis", "Saint Lucia", "Morocco",
-    "Moldova", "Madagascar", "Maldives", "Mexico", "Marshall Islands", "North Macedonia", "Mali", "Malta",
+    "Moldova", "Madagascar", "Maldives", "Mexico", "North Macedonia", "Mali", "Malta",
     "Myanmar", "Montenegro", "Mongolia", "Mozambique", "Mauritania", "Mauritius", "Malawi", "Malaysia",
     "Namibia", "Niger", "Nigeria", "Nicaragua", "Niue", "Netherlands", "Norway", "Nepal", "Nauru", "New Zealand",
     "Oman", "Pakistan", "Panama", "Peru", "Philippines", "Palau", "Papua New Guinea", "Poland", "North Korea",
@@ -215,9 +221,13 @@ function Home() {
     if (guess.toLowerCase() === targetCountry.toLowerCase()) {
       setModalType('win');
       setShowModal(true);
+      setShowAIChatModal(true);   // Also show the AI Chat modal
+
     } else if (newGuesses.length === maxGuesses) {
       setModalType('lose');
       setShowModal(true);
+      setShowAIChatModal(true);   // Also show the AI Chat modal
+
     }
 
     // After animation duration, mark this guess as revealed
@@ -252,9 +262,37 @@ function Home() {
     setShowGuessTreemap(true);
   };
 
+  const WorldMapModal = ({ showWorldMap = true, setShowWorldMap = () => {} }) => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white w-[95vw] h-[90vh] rounded-lg p-8 flex flex-col relative">
+          {/* Map container with flex-grow to take available space */}
+          <div className="flex-grow flex items-center justify-center overflow-hidden">
+            <img 
+              src={map}
+              alt="World Map" 
+              className="max-w-full max-h-full object-contain"
+            />
+          </div>
+          
+          {/* Footer with close button */}
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={() => setShowWorldMap(false)}
+              className="px-6 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+            
+
   // Custom modal component for game results
   function GameResultModal({ modalType, gameBoard, onReset }) {
-    const gameName = 'Carble';
+    const gameName = 'CarbonLE';
     const puzzleNumber = 'Puzzle #1077';
     const title = modalType === 'win' ? 'Congratulations!' : 'Try again next time!';
     const hash = generateHash(targetCountry);
@@ -290,7 +328,7 @@ function Home() {
             borderRadius: '8px',
             padding: '2rem',
             textAlign: 'center',
-            maxWidth: '400px',
+            maxWidth: '500px',
             width: '90%',
             boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
           }}
@@ -342,6 +380,8 @@ function Home() {
               New Game
             </button>
           </div>
+          <OpenAIChat targetCountry={targetCountry} showModal={showModal} />
+
         </div>
       </div>
     );
@@ -564,6 +604,16 @@ function Home() {
         )}
       </div>
 
+
+      {/* OpenAI Chat Modal */}
+      {/* <div style={{ marginTop: '2rem' }}>
+        <button onClick={() => setShowAIChatModal(true)}>Show AI Chat</button>
+
+      {/* OpenAI Chat
+      <div style={{ marginTop: '2rem' }}>
+        <OpenAIChat targetCountry={targetCountry} />
+      </div> */}
+
       {/* Guess form using dropdown populated by unique countries */}
       <div style={{ marginTop: '2rem' }}>
         {guesses.length < maxGuesses ? (
@@ -577,7 +627,20 @@ function Home() {
       {showModal && (
         <GameResultModal modalType={modalType} gameBoard={gameBoard} onReset={resetGame} />
       )}
+
+<div style={{ marginTop: '60px' }}></div>
+
+
+
+      {/* World Map Modal */}
+      {showWorldMap && <WorldMapModal showWorldMap={showWorldMap} setShowWorldMap={setShowWorldMap} />}
+      <div style={{ marginTop: '2rem' }}>
+        <button onClick={() => setShowWorldMap(true)}>Show World Map</button>
+      </div>
+
       <div style={{ marginTop: '300px' }}></div>
+
+
     </div>
     
   );

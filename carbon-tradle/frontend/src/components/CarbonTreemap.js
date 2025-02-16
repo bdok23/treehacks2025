@@ -22,7 +22,7 @@ const renderCustomizedContent = (props) => {
   const fill = COLORS[index % COLORS.length];
 
   // Increase the minimum font size to improve legibility
-  const fontSize = Math.max(12, Math.min(width, height) / 10);
+  const fontSize = Math.max(8, Math.min(width, height) / 10);
 
   // Only show text if the rectangle is large enough
   const showText = width > 50 && height > 20;
