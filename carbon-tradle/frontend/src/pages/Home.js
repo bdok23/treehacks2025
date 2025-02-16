@@ -80,7 +80,33 @@ function Home() {
   const [distanceRange, setDistanceRange] = useState({ max: 0 });
 
   const maxGuesses = 6;
-  const hardcodedTargetCountries = ['China', 'United States', 'India', 'Brazil', 'Russia'];
+  let hardcodedTargetCountries = [
+    "Afghanistan", "Angola", "Albania", "Andorra", "Argentina", "Armenia", "Antigua and Barbuda",
+    "Australia", "Austria", "Azerbaijan", "Burundi", "Belgium", "Benin", "Burkina Faso", "Bangladesh",
+    "Bulgaria", "Bahrain", "Bahamas", "Bosnia and Herzegovina", "Belarus", "Belize", "Bolivia", "Brazil",
+    "Barbados", "Brunei", "Bhutan", "Botswana", "Central African Republic", "Canada", "Chile", "China",
+    "Ivory Coast", "Cameroon", "Democratic Republic of the Congo", "Cook Islands", "Colombia", "Comoros",
+    "Cape Verde", "Costa Rica", "Cuba", "Cyprus", "Czech Republic", "Djibouti", "Dominica", "Denmark",
+    "Dominican Republic", "Algeria", "Croatia", "Cambodia", "Chad", "Germany", "Ecuador", "Egypt", "Eritrea",
+    "Estonia", "Ethiopia", "Finland", "Fiji", "France", "Gabon", "Georgia", "Ghana", "Guinea", "Gambia",
+    "Guinea-Bissau", "Equatorial Guinea", "Greece", "Grenada", "Guatemala", "Guyana", "Honduras", "Haiti",
+    "Hungary", "Indonesia", "India", "Ireland", "Iran", "Iraq", "Iceland", "Israel", "Italy", "Jamaica",
+    "Jordan", "Japan", "Kazakhstan", "Kenya", "Kyrgyzstan", "Kiribati", "Kuwait", "Laos", "Lebanon",
+    "Liberia", "Libya", "Liechtenstein", "Lesotho", "Lithuania", "Luxembourg", "Latvia", "El Salvador",
+    "Eswatini", "Republic of the Congo", "Micronesia", "Saint Kitts and Nevis", "Saint Lucia", "Morocco",
+    "Moldova", "Madagascar", "Maldives", "Mexico", "Marshall Islands", "North Macedonia", "Mali", "Malta",
+    "Myanmar", "Montenegro", "Mongolia", "Mozambique", "Mauritania", "Mauritius", "Malawi", "Malaysia",
+    "Namibia", "Niger", "Nigeria", "Nicaragua", "Niue", "Netherlands", "Norway", "Nepal", "Nauru", "New Zealand",
+    "Oman", "Pakistan", "Panama", "Peru", "Philippines", "Palau", "Papua New Guinea", "Poland", "North Korea",
+    "Portugal", "Paraguay", "Qatar", "Romania", "Russia", "Rwanda", "Saudi Arabia", "São Tomé and Príncipe",
+    "Saint Vincent and the Grenadines", "Samoa", "United Arab Emirates", "Switzerland", "Spain",
+    "United Kingdom", "South Korea", "Sri Lanka", "Sudan", "Senegal", "Singapore", "Solomon Islands",
+    "Sierra Leone", "Somalia", "Serbia", "South Sudan", "Suriname", "Slovakia", "Slovenia", "Sweden",
+    "Seychelles", "Syria", "Togo", "Thailand", "Tajikistan", "Turkmenistan", "Timor-Leste", "Tonga",
+    "Trinidad and Tobago", "Tunisia", "Turkey", "Tuvalu", "Tanzania", "Uganda", "Ukraine", "Uruguay",
+    "United States", "Uzbekistan", "Venezuela", "Vietnam", "Vanuatu", "Yemen", "South Africa", "Zambia", "Zimbabwe"
+  ];
+
 
   // Randomize the target country on mount
   useEffect(() => {
@@ -551,7 +577,9 @@ function Home() {
       {showModal && (
         <GameResultModal modalType={modalType} gameBoard={gameBoard} onReset={resetGame} />
       )}
+      <div style={{ marginTop: '300px' }}></div>
     </div>
+    
   );
 }
 
